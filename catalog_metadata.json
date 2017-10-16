@@ -1,0 +1,92 @@
+{
+    "entities": [
+        {
+            "name": "department",
+            "entity_type_code": "b",
+            "attributes": [
+                {
+                    "name": "name",
+                    "data_type": "varchar(50)",
+                    "nullable": false
+                }
+            ]
+        },
+        {
+            "name": "person",
+            "entity_type_code": "ba",
+            "attributes": [
+                {
+                    "name": "first_name",
+                    "data_type": "varchar(50)",
+                    "nullable": false
+                },
+                {
+                    "name": "last_name",
+                    "data_type": "varchar(50)",
+                    "nullable": false
+                },
+                {
+                    "name": "email_address",
+                    "data_type": "varchar(255)",
+                    "nullable": false
+                }
+            ],
+            "subtype_attributes": [
+                {
+                    "name": "job_title",
+                    "data_type": "varchar(50)"
+                },
+                {
+                    "name": "birth_date",
+                    "data_type": "date"
+                },
+                {
+                    "name": "gender",
+                    "references": "gender_type"
+                },
+                {
+                    "name": "hire_date",
+                    "data_type": "date"
+                }
+            ]
+        },
+        {
+            "name": "employee",
+            "entity_type_code": "s",
+            "base_entity": "person",
+            "parent_entity": "department",
+            "attributes": [
+                {
+                    "name": "job_title",
+                    "nullable": false
+                },
+                {
+                    "name": "birth_date",
+                    "nullable": false
+                },
+                {
+                    "name": "gender",
+                    "nullable": false
+                },
+                {
+                    "name": "hire_date",
+                    "nullable": false
+                }
+            ]
+        },
+        {
+            "name": "gender_type",
+            "entity_type_code": "r",
+            "enum_values": [
+                {
+                    "id": 1,
+                    "name": "male"
+                },
+                {
+                    "id": 2,
+                    "name": "female"
+                }
+            ]
+        }
+    ]
+}

@@ -74,6 +74,12 @@ def generate(args):
     drop_database(args)
     create_database(args)
     create_meta_schema(args)
+    with open('catalog_metadata.json') as catalog_metadata:
+        parsed_json = json.load(catalog_metadata)
+        sql = 'INSERT INTO meta.catalog_metadata SELECT (\'{}\'::jsonb)'.format(json.dumps(parsed_json)).replace('"', '\\"')
+        run_sql_cmd(sql, args)
+
+    run_sql_file('src/meta/scripts/catalog_metadata.sql', args)
 
 def main():
     parser = argparse.ArgumentParser(description='Facilitate creating robust sixth normal form (6NF) databases with a schema generator')

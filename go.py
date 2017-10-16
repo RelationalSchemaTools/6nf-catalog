@@ -3,6 +3,9 @@
 import argparse
 import os
 import subprocess
+import json
+
+MISSING = object()
 
 def check_cmd_call(sp_child):
     data = sp_child.communicate()[0]
@@ -11,7 +14,10 @@ def check_cmd_call(sp_child):
         print('Error! Exiting with status: {}'.format(rc))
         exit(rc)
 
-def run_sql_cmd(sql, args, database):
+def run_sql_cmd(sql, args, database=MISSING):
+    if database is MISSING:
+        database = args.database
+
     env = os.environ.copy()
     env['PGHOST'] = args.host
     env['PGPORT'] = args.port
@@ -21,14 +27,19 @@ def run_sql_cmd(sql, args, database):
     cmd = 'psql --command "{}"'.format(sql)
     check_cmd_call(subprocess.Popen(cmd, shell=True, env=env))
 
-def run_sql_file(file, args, variables, database):
+def run_sql_file(file, args, variables={}, database=MISSING):
+    if database is MISSING:
+        database = args.database
+
     env = os.environ.copy()
     env['PGHOST'] = args.host
     env['PGPORT'] = args.port
     env['PGUSER'] = args.username
     env['PGPASSWORD'] = args.password
     env['PGDATABASE'] = database
+
     psql_variables = ' '.join(['--set "%s=%s"' % (key, value) for (key, value) in variables.items()])
+
     cmd = 'psql --file "{0}" {1}'.format(file, psql_variables)
     check_cmd_call(subprocess.Popen(cmd, shell=True, env=env))
 
@@ -46,9 +57,23 @@ def create_database(args):
     }
     run_sql_file('scripts/create_database.sql', args, variables, 'postgres')
 
+def create_meta_schema(args):
+    print('Creating meta schema')
+    files = [
+        'src/meta/meta.sql',
+        'src/meta/tables/catalog_metadata.sql',
+        'src/meta/tables/entity_type.sql',
+        'src/meta/tables/entity.sql',
+        'src/meta/tables/base_entity_attribute.sql',
+        'src/meta/tables/subtype_entity_attribute.sql'
+    ]
+    for file in files:
+        run_sql_file(file, args)
+
 def generate(args):
     drop_database(args)
     create_database(args)
+    create_meta_schema(args)
 
 def main():
     parser = argparse.ArgumentParser(description='Facilitate creating robust sixth normal form (6NF) databases with a schema generator')

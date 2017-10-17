@@ -65,7 +65,9 @@ def create_meta_schema(args):
         'src/meta/tables/entity_type.sql',
         'src/meta/tables/entity.sql',
         'src/meta/tables/base_entity_attribute.sql',
-        'src/meta/tables/subtype_entity_attribute.sql'
+        'src/meta/tables/subtype_entity_attribute.sql',
+        'src/meta/tables/parent_entity_relationship.sql',
+        'src/meta/tables/referenced_entity_relationship.sql'
     ]
     for file in files:
         run_sql_file(file, args)

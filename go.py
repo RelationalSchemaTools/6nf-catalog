@@ -24,6 +24,7 @@ def run_sql_cmd(sql, args, database=MISSING):
     env['PGUSER'] = args.username
     env['PGPASSWORD'] = args.password
     env['PGDATABASE'] = database
+    env['PAGER'] = ''
     cmd = 'psql --command "{}"'.format(sql)
     check_cmd_call(subprocess.Popen(cmd, shell=True, env=env))
 
@@ -37,6 +38,7 @@ def run_sql_file(file, args, variables={}, database=MISSING):
     env['PGUSER'] = args.username
     env['PGPASSWORD'] = args.password
     env['PGDATABASE'] = database
+    env['PAGER'] = ''
 
     psql_variables = ' '.join(['--set "%s=%s"' % (key, value) for (key, value) in variables.items()])
 

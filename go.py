@@ -80,6 +80,17 @@ def generate(args):
     create_meta_schema(args)
     with open('catalog_metadata.json') as catalog_metadata:
         parsed_json = json.load(catalog_metadata)
+        # PostgreSQL JSONB does not preserve ordering, so ordinal position must be set here
+        for entity in parsed_json['entities']:
+            index = 0
+            if 'attributes' in entity:
+                for attribute in entity['attributes']:
+                    attribute['ordinal_position'] = index
+                    index += 1
+            if 'subtype_attributes' in entity:
+                for attribute in entity['subtype_attributes']:
+                    attribute['ordinal_position'] = index
+                    index += 1
         sql = 'INSERT INTO meta.catalog_metadata SELECT (\'{}\'::jsonb)'.format(json.dumps(parsed_json)).replace('"', '\\"')
         run_sql_cmd(sql, args)
 

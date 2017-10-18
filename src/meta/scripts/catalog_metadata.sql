@@ -15,16 +15,17 @@ SELECT e.name AS entity_name
 
 
 -- base_entity_attribute
-INSERT INTO meta.base_entity_attribute (entity_name, attribute_name, data_type, nullable, is_subtype_attribute)
+INSERT INTO meta.base_entity_attribute (entity_name, attribute_name, data_type, ordinal_position, nullable, is_subtype_attribute)
 SELECT e.name AS entity_name
      , a.name AS attribute_name
      , COALESCE(_et.primary_key_data_type, a.data_type) AS data_type
+     , a.ordinal_position
      , a.nullable
      , false AS is_subtype_attribute
   FROM meta.catalog_metadata AS cm
        CROSS JOIN jsonb_to_recordset(cm.config#>'{entities}') AS e(name varchar(58), entity_type_code char(2), attributes jsonb)
        
-       CROSS JOIN jsonb_to_recordset(e.attributes) AS a(name varchar(61), data_type varchar(30), nullable boolean, "references" varchar(58))
+       CROSS JOIN jsonb_to_recordset(e.attributes) AS a(name varchar(61), data_type varchar(30), ordinal_position smallint, nullable boolean, "references" varchar(58))
        
        LEFT JOIN meta.entity _e
        ON a.references = _e.entity_name
@@ -38,12 +39,13 @@ SELECT e.name AS entity_name
 SELECT e.name AS entity_name
      , a.name AS attribute_name
      , COALESCE(_et.primary_key_data_type, a.data_type) AS data_type
+     , a.ordinal_position
      , true AS nullable
      , false AS is_subtype_attribute
   FROM meta.catalog_metadata AS cm
        CROSS JOIN jsonb_to_recordset(cm.config#>'{entities}') AS e(name varchar(58), entity_type_code char(2), subtype_attributes jsonb)
        
-       CROSS JOIN jsonb_to_recordset(e.subtype_attributes) AS a(name varchar(61), data_type varchar(30), nullable boolean, "references" varchar(58))
+       CROSS JOIN jsonb_to_recordset(e.subtype_attributes) AS a(name varchar(61), data_type varchar(30), ordinal_position smallint, nullable boolean, "references" varchar(58))
        
        LEFT JOIN meta.entity _e
        ON a.references = _e.entity_name

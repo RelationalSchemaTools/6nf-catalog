@@ -82,8 +82,7 @@
         {
             "name": "customer",
             "entity_type_code": "s",
-            "base_entity": "person",
-            "parent_entity": "department"
+            "base_entity": "person"
         },
         {
             "name": "credit_card",

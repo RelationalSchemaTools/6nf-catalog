@@ -4,6 +4,7 @@ import argparse
 import os
 import subprocess
 import json
+import yaml
 
 MISSING = object()
 
@@ -65,11 +66,23 @@ def create_meta_schema(args):
         'src/meta/meta.sql',
         'src/meta/tables/catalog_metadata.sql',
         'src/meta/tables/entity_type.sql',
+        'src/meta/tables/schema.sql',
         'src/meta/tables/entity.sql',
         'src/meta/tables/base_entity_attribute.sql',
         'src/meta/tables/subtype_entity_attribute.sql',
         'src/meta/tables/parent_entity_relationship.sql',
-        'src/meta/tables/referenced_entity_relationship.sql'
+        'src/meta/tables/referenced_entity_relationship.sql',
+
+        'src/meta/views/entity_attribute.sql',
+        'src/meta/views/table.sql',
+        'src/meta/views/table_attribute.sql',
+
+        'src/meta/functions/execute_dynamic_sql.sql',
+        'src/meta/functions/create_schemas.sql',
+        'src/meta/functions/create_tables.sql',
+        'src/meta/functions/create_primary_keys.sql',
+        'src/meta/functions/create_unique_indices.sql',
+        'src/meta/functions/create_foreign_keys.sql'
     ]
     for file in files:
         run_sql_file(file, args)
@@ -78,23 +91,30 @@ def generate(args):
     drop_database(args)
     create_database(args)
     create_meta_schema(args)
-    with open('catalog_metadata.json') as catalog_metadata:
-        parsed_json = json.load(catalog_metadata)
-        # PostgreSQL JSONB does not preserve ordering, so ordinal position must be set here
-        for entity in parsed_json['entities']:
-            index = 0
-            if 'attributes' in entity:
-                for attribute in entity['attributes']:
-                    attribute['ordinal_position'] = index
-                    index += 1
-            if 'subtype_attributes' in entity:
-                for attribute in entity['subtype_attributes']:
-                    attribute['ordinal_position'] = index
-                    index += 1
+
+    with open('./catalog_metadata.yaml', 'r') as f:
+        parsed_json = yaml.safe_load(f)
+
+        for schema in parsed_json['schemas']:
+            for entity in schema['entities']:
+
+                index = 0
+
+                if 'attributes' in entity:
+                    for attribute in entity['attributes']:
+                        attribute['ordinal_position'] = index
+                        index += 1
+
+                if 'subtype_attributes' in entity:
+                    for attribute in entity['subtype_attributes']:
+                        attribute['ordinal_position'] = index
+                        index += 1
+
         sql = 'INSERT INTO meta.catalog_metadata SELECT (\'{}\'::jsonb)'.format(json.dumps(parsed_json)).replace('"', '\\"')
         run_sql_cmd(sql, args)
 
     run_sql_file('src/meta/scripts/catalog_metadata.sql', args)
+    run_sql_file('src/meta/scripts/generate_schema.sql', args)
 
 def main():
     parser = argparse.ArgumentParser(description='Facilitate creating robust sixth normal form (6NF) databases with a schema generator')

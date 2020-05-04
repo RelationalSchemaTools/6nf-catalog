@@ -4,9 +4,9 @@ BEGIN
     PERFORM meta.execute_dynamic_sql(
                 CONCAT('CREATE UNIQUE INDEX ', E'\n', --table_name, '__', attribute_name, '_ux', E'\n',
                        E'\t', 'ON ', schema_name, '.', table_name, E'\n',
-                        E'\t', 'USING btree (', attribute_name, ');')
+                        E'\t', 'USING btree (', column_name, ');')
             )
-       FROM meta.table_attribute
+       FROM meta.column
       WHERE is_logical_primary_key IS TRUE
         AND is_db_primary_key IS FALSE;
 END;

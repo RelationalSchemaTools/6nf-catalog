@@ -75,14 +75,18 @@ def create_meta_schema(args):
 
         'src/meta/views/entity_attribute.sql',
         'src/meta/views/table.sql',
-        'src/meta/views/table_attribute.sql',
+        'src/meta/views/column.sql',
 
         'src/meta/functions/execute_dynamic_sql.sql',
         'src/meta/functions/create_schemas.sql',
         'src/meta/functions/create_tables.sql',
         'src/meta/functions/create_primary_keys.sql',
         'src/meta/functions/create_unique_indices.sql',
-        'src/meta/functions/create_foreign_keys.sql'
+        'src/meta/functions/create_indices.sql',
+        'src/meta/functions/create_foreign_keys.sql',
+        'src/meta/functions/create_views.sql',
+        'src/meta/functions/create_insert_trigger_functions.sql',
+        'src/meta/functions/create_insert_triggers.sql'
     ]
     for file in files:
         run_sql_file(file, args)

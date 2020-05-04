@@ -4,8 +4,8 @@ BEGIN
     CREATE TEMP TABLE attribute_agg ON COMMIT DROP AS
     SELECT schema_name
          , table_name
-         , STRING_AGG(CONCAT(attribute_name, ' ', data_type, ' NOT NULL'), E'\n,\t' ORDER BY ordinal_position) AS attributes_definition
-      FROM meta.table_attribute
+         , STRING_AGG(CONCAT(column_name, ' ', data_type, ' NOT NULL'), E'\n,\t' ORDER BY ordinal_position) AS attributes_definition
+      FROM meta.column
      GROUP BY schema_name
             , table_name;
 

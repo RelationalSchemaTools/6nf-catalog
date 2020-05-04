@@ -3,18 +3,19 @@ $BODY$
 BEGIN
 
     CREATE TEMP TABLE foreign_key_sql ON COMMIT DROP AS
-    SELECT ta.schema_name
-         , ta.table_name
-         , CONCAT('ALTER TABLE ', ta.schema_name, '.', ta.table_name, E'\n',
-                  E'\t', 'ADD FOREIGN KEY (', ta.attribute_name, ')', E'\n',
-                  E'\t', 'REFERENCES ', t.schema_name, '.', t.table_name, ' (', ta.attribute_name, ');') AS sql_definition
-      FROM meta.table_attribute AS ta
+    SELECT c.schema_name
+         , c.table_name
+         , CONCAT('ALTER TABLE ', c.schema_name, '.', c.table_name, E'\n',
+                  E'\t', 'ADD FOREIGN KEY (', c.column_name, ')', E'\n',
+                  E'\t', 'REFERENCES ', t.schema_name, '.', t.table_name, ' (', c.column_name, ');') AS sql_definition
+      FROM meta.column AS c
            JOIN meta.table AS t
-           ON ta.entity_name = t.entity_name
+           ON c.entity_name = t.entity_name
               AND t.is_base_table IS TRUE
               AND t.is_history_table IS FALSE
      WHERE is_db_primary_key IS TRUE
        AND is_identity IS FALSE
+       AND is_audit_attribute IS FALSE
 
      UNION ALL
 

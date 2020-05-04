@@ -3,9 +3,9 @@ $BODY$
 BEGIN
     PERFORM meta.execute_dynamic_sql(
                 CONCAT('ALTER TABLE ', schema_name, '.', table_name, E'\n',
-                       E'\t', 'ADD PRIMARY KEY (', STRING_AGG(attribute_name, ', ' ORDER BY ordinal_position), ');')
+                       E'\t', 'ADD PRIMARY KEY (', STRING_AGG(column_name, ', ' ORDER BY ordinal_position), ');')
             )
-       FROM meta.table_attribute
+       FROM meta.column
       WHERE is_db_primary_key IS TRUE
       GROUP BY schema_name
              , table_name;

@@ -14,12 +14,16 @@ SELECT ea.schema_name
      , ea.data_type AS attribute_data_type
      , CONCAT(ea.base_entity_name,
               CASE WHEN e.entity_type_code = 'r'
-                             THEN ''
-                        WHEN ea.is_logical_primary_key
-                             THEN '__base'
-                        ELSE CONCAT('__', ea.attribute_name) END,
+                        THEN ''
+                   WHEN ea.is_logical_primary_key
+                        THEN '__base'
+                   ELSE CONCAT('__', ea.attribute_name) END,
               h.suffix
        ) AS table_name
+     , CASE WHEN ea.is_logical_primary_key IS TRUE
+                 THEN 'base'
+            ELSE ea.attribute_name
+       END AS table_alias
      , e.entity_type_code
      , ea.is_logical_primary_key AS is_base_table
      , ea.is_logical_primary_key AS is_attribute_logical_primary_key
